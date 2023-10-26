@@ -36,9 +36,9 @@
                 {% endif %}
                 <div class="task-actions">
                     {% if not item.completed %}
-                    <a href="{{ url_for('complete', item_id=item.id) }}">[✔]</a>
+                    <a href="{{ url_for('views.complete', item_id=item.id) }}">[✔]</a>
                     {% endif %}
-                    <a href="{{ url_for('delete', item_id=item.id) }}">[✗]</a>
+                    <a href="{{ url_for('views.delete', item_id=item.id) }}">[✗]</a>
                 </div>
             </li>
             {% endfor %}

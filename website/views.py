@@ -1,22 +1,10 @@
-from flask import Flask, render_template, request, redirect
-from flask_sqlalchemy import SQLAlchemy
+from flask import render_template, request, redirect, url_for,  Blueprint
+from .models import TodoItem
+from . import db
 
-app = Flask(__name__)
+views = Blueprint('views', __name__)
 
-# Configuring the SQLAlchemy database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
-db = SQLAlchemy(app)
-
-# TodoItem model representing a table in the database
-class TodoItem(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String(2000))
-    completed = db.Column(db.Boolean, default=False)
-
-    def __repr__(self):
-        return f'<TodoItem {self.id}>'
-
-@app.route("/", methods=['GET', 'POST'])
+@views.route("/", methods=['GET', 'POST'])
 def index():
     if request.method == "POST":
         # Creating a new TodoItem object and adding it to the database
@@ -31,7 +19,7 @@ def index():
         items = TodoItem.query.all()
         return render_template('index.html', items=items)
 
-@app.route('/complete/<int:item_id>')
+@views.route('/complete/<int:item_id>')
 def complete(item_id):
     # Retrieving a TodoItem object by ID, making it as completed, and commiting the changes
     item = TodoItem.query.get_or_404(item_id)
@@ -39,7 +27,7 @@ def complete(item_id):
     db.session.commit()
     return redirect('/')
 
-@app.route('/delete/<int:item_id>')
+@views.route('/delete/<int:item_id>')
 def delete(item_id):
     # Retrieving a TodoItem object by ID, deleting it, and commiting the changes
     item = TodoItem.query.get_or_404(item_id)
@@ -47,8 +35,3 @@ def delete(item_id):
     db.session.commit()
     return redirect('/')
 
-if __name__ == "__main__":
-    # Creating the database tables
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
